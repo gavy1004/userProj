@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>Insert title here</title>
+	<script src='./js/jquery-3.6.0.min.js'></script>
+	<script>
+		$(document).ready(function () {
+			// 조회
+			$.ajax({
+				url: 'getUserListServlet',
+				type: 'get',
+				dataType: 'json',
+				success: showList,
+				error: function (err) {
+					console.log(err);
+				}
+			});
+			// 테이블 조회 
+			let $table = $('<table />').attr('border', '1');
+			let $tr = $('<tr />');
+			function showList(result) {
+				$table.append(getTitle());
+				for (let i = 0; i < result.length; i++) {
+					let $td = $('<td />');
+					let modifyBtn = $('<button />').html('수정');
+					modifyBtn.click(modifyRow);
+					
+					$tr = $('<tr />').append(
+						$('<td />').html(result[i].userid),
+						$('<td />').html(result[i].name),
+						$('<td />').html(result[i].phone),
+						$('<td />').html(result[i].gender),
+						$('<td />').append(modifyBtn)
+					)
+					$table.append($tr);
+				}
+				$("#show").append($table);
+			}
+
+			// 타이틀
+			function getTitle() {
+				let $title = $('<tr />');
+				$title.css('background-color', 'pink');
+				$title.append(
+					$('<th />').html('회원번호'),
+					$('<th />').html('이름'),
+					$('<th />').html('연락처'),
+					$('<th />').html('성별'),
+					$('<th />').html('기능'),
+				);
+				return $title;
+			}
+			
+			
+			// 등록
+			$("#frm").on(
+				'submit',
+				function (e) {
+					e.preventDefault();
+					$.ajax({
+						url: $('#frm').attr('action'),
+						data:'userid='+$('#userid').val()+
+							'&name=' + $('#name').val()+
+							'&pass=' + $('#pass').val()+
+							'&phone=' + $('#phone').val()+
+							'&gender=' + $('input[name="gender"]:checked' ).val(),
+						datatype:'json',
+						type:'post',
+						success: createRow,
+						error: function() {}
+					})
+				}
+			)
+			// 등록시 행추가 
+			function createRow() {
+					let modifyBtn = $('<button />').html('수정');
+					modifyBtn.click(modifyRow);
+					
+					$tr = $('<tr />').append(
+						$('<td />').html($('#userid').val()),
+						$('<td />').html($('#name').val()),
+						$('<td />').html($('#phone').val()),
+						$('<td />').html($('input[name="gender"]:checked' ).val()),
+						$('<td />').append(modifyBtn)
+					)
+					$table.append($tr);
+				$("#show").append($table);
+			}
+			
+			
+			// 수정
+			function modifyRow(e) {
+				e.preventDefault();
+				e.stopPropagation();
+				let id = $(this).parent().parent().children().eq(0).html();
+				$.ajax({
+					url:'updateservlet',
+					
+				})
+
+			}
+		})
+	</script>
+</head>
+
+<body>
+	<form id='frm' action='./getUserListServlet' method='post'>
+		<table border='1'>
+			<caption>
+				<등록화면>
+			</caption>
+			<tr>
+				<td>사용ID</td>
+				<td><input type="text" name="userid" id="userid"></td>
+			</tr>
+			<tr>
+				<td>이름</td>
+				<td><input type="text" name="name" id="name"></td>
+			</tr>
+			<tr>
+				<td>비밀번호</td>
+				<td><input type="text" name="pass" id="pass"></td>
+			</tr>
+			<tr>
+				<td>연락처</td>
+				<td><input type="text" name="phone" id="phone"></td>
+			</tr>
+			<tr>
+				<td>성별</td>
+				<td>남성<input type="radio" value="남성" name="gender">&nbsp;
+					여성<input type="radio" value="여성" name="gender"></td>
+			</tr>
+			<tr>
+				<td colspan="2"><input type="submit" value="등록"> <input type="reset" value="취소"></td>
+			</tr>
+		</table>
+		
+		<div id="show"></div>
+		
+	</form>
+</body>
+
+</html>
