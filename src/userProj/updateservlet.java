@@ -25,26 +25,17 @@ public class updateservlet extends HttpServlet {
 		response.setContentType("text/html;charset-UTF-8");
 		
 		String id = request.getParameter("userid");
-		String name = request.getParameter("name");
-		String pass = request.getParameter("pass");
 		String phone = request.getParameter("phone");
-		String gender = request.getParameter("gender");
 		
 		UserDAO dao = new UserDAO();
 		UserVO vo = new UserVO();
-		vo.setUserId(id);
-		vo.setUserName(name);
-		vo.setUserPass(pass);
-		vo.setUserPhone(phone);
-		vo.setUserGender(gender);
 		
-		JSONObject obj = new JSONObject();
-		if (dao.updateUser(vo)) {
-			obj.put("retCode", "Success");
-		} else {
-			obj.put("retCode", "Fail");
-		}
-		response.getWriter().print(obj);
+		vo.setUserId(id);
+		vo.setUserPhone(phone);
+		
+		UserVO rvo = dao.updateUser(vo);
+		phone = rvo.getUserPhone();
+		response.getWriter().print(phone);
 	}
 
 }

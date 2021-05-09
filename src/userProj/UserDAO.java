@@ -91,29 +91,35 @@ public class UserDAO {
 	}
 	
 	// 수정
-	public boolean updateUser(UserVO vo) {
+	public UserVO updateUser(UserVO vo) {
 		conn = DBCon.getConnect();
 		PreparedStatement psmt = null;
-		int modifyCnt =0;
-		String sql = "update user_temp set User_name= ?, User_pass=?, User_phone=?, User_gender=? where user_id=?";
-
+		String sql = "update user_temp set User_phone=? where user_id=?";
+		String sql2 = "select * from user_temp where user_id = ?";
+		UserVO rvo = new UserVO();
+		
 		try {
 			psmt = conn.prepareStatement(sql);
-			psmt.setString(1, vo.getUserName());
-			psmt.setString(2, vo.getUserPass());
-			psmt.setString(3, vo.getUserPhone());
-			psmt.setString(4, vo.getUserGender());
-			psmt.setString(5, vo.getUserId());
+			psmt.setString(1, vo.getUserPhone());
+			psmt.setString(2, vo.getUserId());
 			
-			modifyCnt = psmt.executeUpdate();
-			System.out.println(modifyCnt + "건 수정.");
+			int r =  psmt.executeUpdate();
+			System.out.println(r + "건 수정.");
+			
+			//수정한 데이터
+			psmt = conn.prepareStatement(sql2);
+			psmt.setString(1, vo.getUserId());
+			rs = psmt.executeQuery();
+			if(rs.next()) {
+				rvo.setUserPhone(rs.getString("user_phone"));
+			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
 			close();
 		}
-		return modifyCnt == 0 ? false : true;
+		return rvo;
 	}
 	
 	

@@ -17,27 +17,6 @@
 					console.log(err);
 				}
 			});
-			// 테이블 조회 
-			let $table = $('<table />').attr('border', '1');
-			let $tr = $('<tr />');
-			function showList(result) {
-				$table.append(getTitle());
-				for (let i = 0; i < result.length; i++) {
-					let $td = $('<td />');
-					let modifyBtn = $('<button />').html('수정');
-					modifyBtn.click(modifyRow);
-					
-					$tr = $('<tr />').append(
-						$('<td />').html(result[i].userid),
-						$('<td />').html(result[i].name),
-						$('<td />').html(result[i].phone),
-						$('<td />').html(result[i].gender),
-						$('<td />').append(modifyBtn)
-					)
-					$table.append($tr);
-				}
-				$("#show").append($table);
-			}
 
 			// 타이틀
 			function getTitle() {
@@ -53,8 +32,31 @@
 				return $title;
 			}
 			
+			// 테이블 조회 
+			let $table = $('<table />').attr('border', '1');
+			let $tr = $('<tr />');
+			function showList(result) {
+				$table.append(getTitle());
+				
+				for (let i = 0; i < result.length; i++) {
+					//let $td = $('<td />');
+					let modifyBtn = $('<button />').html('수정');
+					modifyBtn.click(modifyRow);
+					let inPut = $('<input />').attr('type','text');
+					$tr = $('<tr />').append(
+							$('<td />').html(result[i].userid),
+							$('<td />').html(result[i].name),
+							$('<td />').append(inPut.attr('value',result[i].phone)),
+							$('<td />').html(result[i].gender),
+							$('<td />').append(modifyBtn)
+						)
+					$table.append($tr);
+				}
+				$("#show").append($table);
+			}
+
 			
-			// 등록
+			// 제출
 			$("#frm").on(
 				'submit',
 				function (e) {
@@ -73,6 +75,8 @@
 					})
 				}
 			)
+			
+			
 			// 등록시 행추가 
 			function createRow() {
 					let modifyBtn = $('<button />').html('수정');
@@ -94,13 +98,27 @@
 			function modifyRow(e) {
 				e.preventDefault();
 				e.stopPropagation();
+				// id
 				let id = $(this).parent().parent().children().eq(0).html();
+				// 수정할 phone
+				console.log($(this).parent().parent().children().eq(2).html());
+				let phone =$(this).parent().parent().children().eq(2).html();
+				// 수정할 값
+				let phoneVal = $(this).parent().parent().children().eq(2).children().val();
 				$.ajax({
 					url:'updateservlet',
-					
-				})
+					data: 'id='+id+'&phone='+phoneVal,
+					type: 'post',
+					success: function(result) {
+						phone.attr('value', result);
+					},
+					error: function(err) {
+						console.log(err);
+					}
+				});
 
 			}
+			
 		})
 	</script>
 </head>
@@ -136,10 +154,7 @@
 				<td colspan="2"><input type="submit" value="등록"> <input type="reset" value="취소"></td>
 			</tr>
 		</table>
-		
 		<div id="show"></div>
-		
 	</form>
 </body>
-
 </html>
